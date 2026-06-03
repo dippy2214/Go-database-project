@@ -29,6 +29,7 @@ func main() {
 	case "recent":
 		recent(store)
 	case "serve":
+		http.HandleFunc("/", homeHandler())
 		http.HandleFunc("/entries", entriesHandler(store))
 		http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
 			switch r.Method {

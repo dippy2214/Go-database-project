@@ -183,3 +183,9 @@ func editPostHandler(store *Store) http.HandlerFunc {
 		http.Redirect(w, r, "/entries", http.StatusSeeOther)
 	}
 }
+
+func homeHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/entries", http.StatusSeeOther)
+	}
+}

@@ -143,5 +143,4 @@ func (s *Store) GetEntry(id int) (Entry, error) {
 	WHERE id = ?`, id).Scan(&e.ID, &e.VisitedAt, &e.Place, &e.Comment)
 
 	return e, err
-
 }

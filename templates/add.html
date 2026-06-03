@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<style>
+    .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 8px 12px;
+        margin-bottom: 10px;
+
+        background: #2d6cdf;
+        color: white;
+
+        text-decoration: none;
+        border: none;
+
+        font: inherit;
+        font-size: 14px;
+        line-height: 1;
+
+        border-radius: 4px;
+
+        box-sizing: border-box;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background: #1f4fb2;
+    }
+</style>
+
+<html>
+<head>
+    <title>Add Entry</title>
+</head>
+<body>
+
+<h1>Add Travel Entry</h1>
+
+<form method="POST" action="/add">
+    <label>Time:</label><br>
+    <input type="text" name="visited_at" placeholder="YYYY-MM-DD HH:MM:SS"><br><br>
+
+    <label>Place:</label><br>
+    <input type="text" name="place"><br><br>
+
+    <label>Comment:</label><br>
+    <input type="text" name="comment"><br><br>
+
+    <button type="submit" class="button">Add</button>
+    <a href="/entries" class="button">Cancel</a>
+</form>
+
+</body>
+</html>

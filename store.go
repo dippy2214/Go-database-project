@@ -25,10 +25,10 @@ type Store struct {
 }
 
 type Entry struct {
-	ID        int
-	VisitedAt time.Time
-	Place     string
-	Comment   string
+	ID        int       `json:"id"`
+	VisitedAt time.Time `json:"visited_at"`
+	Place     string    `json:"place"`
+	Comment   string    `json:"comment"`
 }
 
 func init() {
@@ -78,19 +78,29 @@ func (s *Store) ListEntries() ([]Entry, error) {
 	return entries, nil
 }
 
-func (s *Store) AddEntry(time time.Time, place string, comment string) error {
+func (s *Store) AddEntry(time time.Time, place string, comment string) (Entry, error) {
 
-	_, err := s.db.Exec(`
+	result, err := s.db.Exec(`
         INSERT INTO entries 
 		(visited_at, place, comment)
         VALUES (?, ?, ?)
     `, time, place, comment)
 
 	if err != nil {
-		return err
+		return Entry{}, err
 	}
 
-	return nil
+	id, err := result.LastInsertId()
+	if err != nil {
+		return Entry{}, err
+	}
+
+	return Entry{
+		ID:        int(id),
+		VisitedAt: time,
+		Place:     place,
+		Comment:   comment,
+	}, nil
 }
 
 func (s *Store) RecentEntries(count int) ([]Entry, error) {
@@ -118,21 +128,43 @@ func (s *Store) RecentEntries(count int) ([]Entry, error) {
 }
 
 func (s *Store) DeleteEntry(id int) error {
-	_, err := s.db.Exec(`
+	result, err := s.db.Exec(`
 		DELETE FROM entries
 		WHERE id = ?
 	`, id)
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }
 
-func (s *Store) UpdateEntry(id int, time time.Time, place string, comment string) error {
+func (s *Store) UpdateEntry(id int, time time.Time, place string, comment string) (Entry, error) {
 	_, err := s.db.Exec(`UPDATE entries 
 	SET visited_at = ?, place = ?, comment = ? 
 	WHERE id = ?
 	`, time, place, comment, id)
 
-	return err
+	if err != nil {
+		return Entry{}, err
+	}
+
+	return Entry{
+		ID:        int(id),
+		VisitedAt: time,
+		Place:     place,
+		Comment:   comment,
+	}, nil
 }
 
 func (s *Store) GetEntry(id int) (Entry, error) {

@@ -29,30 +29,41 @@ func main() {
 	case "recent":
 		recent(store)
 	case "serve":
-		http.HandleFunc("/", homeHandler())
-		http.HandleFunc("/entries", entriesHandler(store))
-		http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
-			switch r.Method {
-			case http.MethodGet:
-				addFormHandler(w, r)
-			case http.MethodPost:
-				addPostHandler(store)(w, r)
-			default:
-				http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			}
-		})
-		http.HandleFunc("/delete", deleteHandler(store))
-		http.HandleFunc("/edit", func(w http.ResponseWriter, r *http.Request) {
-			switch r.Method {
-			case http.MethodGet:
-				editGetHandler(store)(w, r)
-			case http.MethodPost:
-				editPostHandler(store)(w, r)
-			default:
-				http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			}
-		})
-		log.Fatal(http.ListenAndServe(":8080", nil))
+		//HTML pages
+		// http.HandleFunc("/", homeHandler())
+		// http.HandleFunc("/entries", entriesHandler(store))
+		// http.HandleFunc("/add", func(w http.ResponseWriter, r *http.Request) {
+		// 	switch r.Method {
+		// 	case http.MethodGet:
+		// 		addFormHandler(w, r)
+		// 	case http.MethodPost:
+		// 		addPostHandler(store)(w, r)
+		// 	default:
+		// 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		// 	}
+		// })
+		// http.HandleFunc("/delete", deleteHandler(store))
+		// http.HandleFunc("/edit", func(w http.ResponseWriter, r *http.Request) {
+		// 	switch r.Method {
+		// 	case http.MethodGet:
+		// 		editGetHandler(store)(w, r)
+		// 	case http.MethodPost:
+		// 		editPostHandler(store)(w, r)
+		// 	default:
+		// 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		// 	}
+		// })
+		//JSON API
+		mux := http.NewServeMux()
+
+		mux.HandleFunc("GET /api/entries", apiEntriesHandler(store))
+		mux.HandleFunc("POST /api/entries", apiCreateEntryHandler(store))
+
+		mux.HandleFunc("GET /api/entries/{id}", apiSingleEntryHandler(store))
+		mux.HandleFunc("PUT /api/entries/{id}", apiEditHandler(store))
+		mux.HandleFunc("DELETE /api/entries/{id}", apiDeleteHandler(store))
+
+		log.Fatal(http.ListenAndServe(":8080", mux))
 	default:
 		fmt.Println("unknown command: ", os.Args[1])
 	}

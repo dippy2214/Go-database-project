@@ -40,7 +40,7 @@ func add(store *Store) {
 	if err != nil {
 		log.Fatal("failed to parse time: ", err)
 	}
-	err = store.AddEntry(t, os.Args[3], os.Args[4])
+	_, err = store.AddEntry(t, os.Args[3], os.Args[4])
 	if err != nil {
 		log.Fatal("failed to add entry: ", err)
 	}

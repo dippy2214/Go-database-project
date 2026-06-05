@@ -80,7 +80,7 @@ func addPostHandler(store *Store) http.HandlerFunc {
 			return
 		}
 
-		err = store.AddEntry(t, place, comment)
+		_, err = store.AddEntry(t, place, comment)
 		if err != nil {
 			http.Error(w, "db insert failed", http.StatusInternalServerError)
 			return
@@ -174,7 +174,7 @@ func editPostHandler(store *Store) http.HandlerFunc {
 			return
 		}
 
-		err = store.UpdateEntry(id, t, place, comment)
+		_, err = store.UpdateEntry(id, t, place, comment)
 		if err != nil {
 			http.Error(w, "update failed", http.StatusInternalServerError)
 			return

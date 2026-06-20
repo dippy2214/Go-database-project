@@ -64,7 +64,7 @@ func main() {
 		mux.HandleFunc("PUT /api/entries/{id}", apiEditHandler(store))
 		mux.HandleFunc("DELETE /api/entries/{id}", apiDeleteHandler(store))
 
-		log.Fatal(http.ListenAndServe(":8080", mux))
+		log.Fatal(http.ListenAndServe(":8080", cors(mux)))
 	default:
 		fmt.Println("unknown command: ", os.Args[1])
 	}

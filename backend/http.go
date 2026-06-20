@@ -46,7 +46,7 @@ func entriesHandler(store *Store) http.HandlerFunc {
 	}
 }
 
-func addFormHandler(w http.ResponseWriter, r *http.Request) {
+func addFormHandler(w http.ResponseWriter, _ *http.Request) {
 	tmpl, err := template.ParseFiles("templates/add.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

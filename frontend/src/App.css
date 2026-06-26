@@ -35,6 +35,10 @@
   color: #555;
 }
 
+.header button {
+  margin-top: 1rem;
+}
+
 .edit-form {
   background: white;
   padding: 16px;

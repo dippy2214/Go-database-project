@@ -1,20 +1,58 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-
-
-function Header() {
+function Header({onAdd}) {
   return (
   <div className="header">
     <h1>Travel Log</h1>
     <p>A record of my trip to edinburgh</p>
+    <button className="button" onClick={onAdd}>
+      Add New Entry
+    </button>
   </div>
+  
+  );
+}
+
+function EntryForm({ title, formData, setFormData, onSave, onCancel }) {
+  return (
+    <div className="edit-form">
+      <h3>{title}</h3>
+
+      <input
+        value={formData.place}
+        onChange={(e) =>
+          setFormData({ ...formData, place: e.target.value })
+        }
+      />
+
+      <input
+        value={formData.comment}
+        onChange={(e) =>
+          setFormData({ ...formData, comment: e.target.value })
+        }
+      />
+
+      <input
+        type="datetime-local"
+        value={new Date(formData.visited_at).toISOString().slice(0, 16)}
+        onChange={(e) =>
+          setFormData({ ...formData, visited_at: e.target.value })
+        }
+      />
+
+      <div className="button-row">
+        <button onClick={onSave}>Save</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
   );
 }
 
 function App() {
   const [entries, setEntries] = useState([])
   const [editingEntry, setEditingEntry] = useState(null);
+  const [addingEntry, setAddingEntry] = useState(false);
   const [formData, setFormData] = useState({
     place: "",
     comment: "",
@@ -22,13 +60,27 @@ function App() {
   });
 
   function startEdit(entry) {
-    setEditingEntry(entry);
+    setAddingEntry(false)
 
     setFormData({
       place: entry.place,
       comment: entry.comment,
       visited_at: entry.visited_at
     });
+    
+    setEditingEntry(entry);
+  }
+
+  function startCreate() {
+    setEditingEntry(null);
+
+    setFormData({
+      place: "",
+      comment: "",
+      visited_at: new Date().toISOString()
+    });
+    
+    setAddingEntry(true);
   }
 
   function deleteEntry(id) {
@@ -60,6 +112,21 @@ function App() {
       });
   }
 
+  function saveNewEntry() {
+    fetch(`http://81.100.84.76:8080/api/entries`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(formData).padEnd(3, "00Z")
+    })
+      .then(res => res.json())
+      .then(() => {
+        setAddingEntry(false);
+        loadEntries(); // refresh list
+      });
+  }
+
   useEffect(() => {
       loadEntries()
     }, [] );
@@ -67,38 +134,26 @@ function App() {
   return (
     <>
       <div className="container">
-        <Header/>
-
+        <Header onAdd={startCreate}/>
         {editingEntry && (
-          <div className="edit-form">
-            <h3>Edit Entry</h3>
+          <EntryForm
+            title="Edit Entry"
+            formData={formData}
+            setFormData={setFormData}
+            onSave={saveEdit}
+            onCancel={() => setEditingEntry(null)}
+          />
+        )}
 
-            <input
-              value={formData.place}
-              onChange={(e) =>
-                setFormData({ ...formData, place: e.target.value })
-              }
-            />
-
-            <input
-              value={formData.comment}
-              onChange={(e) =>
-                setFormData({ ...formData, comment: e.target.value })
-              }
-            />
-
-            <input
-              type="datetime-local"
-              value={new Date(formData.visited_at).toISOString().slice(0,16)}
-              onChange={(e) =>
-                setFormData({ ...formData, visited_at: e.target.value })
-              }
-            />
-            <div className="button-row">
-              <button onClick={saveEdit}>Save</button>
-              <button onClick={() => setEditingEntry(null)}>Cancel</button>
-            </div>
-          </div>)}
+        {addingEntry && (
+          <EntryForm
+            title="New Entry"
+            formData={formData}
+            setFormData={setFormData}
+            onSave={saveNewEntry}
+            onCancel={() => setAddingEntry(false)}
+          />
+        )}
 
         <div className="entries-grid">
           {entries.map(entry => (

@@ -84,21 +84,21 @@ function App() {
   }
 
   function deleteEntry(id) {
-    fetch(`http://81.100.84.76:8080/api/entries/${id}`, {
+    fetch(`/api/entries/${id}`, {
       method: "DELETE"
     })
     .then(() => loadEntries());
   }
 
   function loadEntries () {
-    fetch("http://81.100.84.76:8080/api/entries")
+    fetch("/api/entries")
         .then(response => response.json())
         .then(data => setEntries(data))
         .catch(error => console.error(error));
   }
 
   function saveEdit() {
-    fetch(`http://81.100.84.76:8080/api/entries/${editingEntry.id}`, {
+    fetch(`/api/entries/${editingEntry.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
@@ -113,7 +113,7 @@ function App() {
   }
 
   function saveNewEntry() {
-    fetch(`http://81.100.84.76:8080/api/entries`, {
+    fetch(`/api/entries`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
